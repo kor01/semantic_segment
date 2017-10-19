@@ -18,18 +18,16 @@ from utils import plotting_tools
 from utils import model_tools
 
 
-def separable_conv2d_batchnorm(input_layer, filters, strides=1):
+def separable_conv2d_batchnorm(input_layer, filters, is_train, strides=1):
   output_layer = SeparableConv2DKeras(filters=filters, kernel_size=3, strides=strides,
                                       padding='same', activation='relu')(input_layer)
-  output_layer = tf.layers.batch_normalization(output_layer, training=True)
   # output_layer = layers.BatchNormalization()(output_layer)
   return output_layer
 
 
-def conv2d_batchnorm(input_layer, filters, kernel_size=3, strides=1):
+def conv2d_batchnorm(input_layer, filters, is_train, kernel_size=3, strides=1):
   output_layer = layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
                                padding='same', activation='relu')(input_layer)
-  output_layer = tf.layers.batch_normalization(output_layer, training=True)
   # output_layer = layers.BatchNormalization()(output_layer)
   return output_layer
 
@@ -44,23 +42,34 @@ def encoder_block(input_layer, filters, strides):
   return output_layer
 
 
-def decoder_block(small_ip_layer, large_ip_layer, filters):
+def decoder_block(small_ip_layer, large_ip_layer, filters, is_train):
   upsampled_small_ip_layer = bilinear_upsample(small_ip_layer)
   concat_layer = layers.concatenate([upsampled_small_ip_layer, large_ip_layer])
-  output_layer = separable_conv2d_batchnorm(concat_layer, filters)
-  output_layer = separable_conv2d_batchnorm(output_layer, filters)
+  output_layer = separable_conv2d_batchnorm(concat_layer, filters, is_train=is_train)
+  output_layer = separable_conv2d_batchnorm(output_layer, filters, is_train=is_train)
   return output_layer
 
 
-def fcn_model(inputs, num_classes):
+def fcn_model(inputs, num_classes, is_train):
 
-  encoder1 = encoder_block(inputs, filters=16, strides=2)
-  encoder2 = encoder_block(encoder1, filters=32, strides=2)
-  encoder3 = encoder_block(encoder2, filters=64, strides=2)
+  encoder1 = encoder_block(inputs, filters=32, strides=2)
+  encoder2 = encoder_block(encoder1, filters=64, strides=2)
+  encoder3 = encoder_block(encoder2, filters=128, strides=2)
 
-  conv_1x1 = conv2d_batchnorm(encoder3, filters=128, kernel_size=1, strides=1)
-  decoder1 = decoder_block(small_ip_layer=conv_1x1, large_ip_layer=encoder2, filters=64)
-  decoder2 = decoder_block(small_ip_layer=decoder1, large_ip_layer=encoder1, filters=32)
-  decoder3 = decoder_block(small_ip_layer=decoder2, large_ip_layer=inputs, filters=16)
+  conv_1x1 = conv2d_batchnorm(
+    encoder3, filters=64, kernel_size=1,
+    strides=1, is_train=is_train)
+
+  decoder1 = decoder_block(
+    small_ip_layer=conv_1x1, large_ip_layer=encoder2,
+    filters=128, is_train=is_train)
+  decoder2 = decoder_block(
+    small_ip_layer=decoder1, large_ip_layer=encoder1,
+    filters=64, is_train=is_train)
+
+  decoder3 = decoder_block(
+    small_ip_layer=decoder2, large_ip_layer=inputs,
+    filters=32, is_train=is_train)
+
   return layers.Conv2D(num_classes, 1, padding='same')(decoder3)
 
