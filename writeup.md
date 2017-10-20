@@ -1,11 +1,11 @@
-#**Semantic Segmentation**
+# **Semantic Segmentation**
 
 
-###Semantic segmentation model
+### Semantic segmentation model for specific target tracking
 
 ---
 
-###**Project Implementation Overview**
+### **Project Implementation Overview**
 
 * this project is implemented in tensorflow
 * the data provider functionality is implemented in ```segment_net/dataset.py```, using the new dataset feature.
@@ -15,7 +15,7 @@
 * new model architecture can be added by register in file ```segment_net/network.py```
 
 
-###**Project Setup**
+### **Project Setup**
 
 Steps of this project are the following:
 * download or collect segmentation dataset, preprocessed as images and masks
@@ -25,7 +25,7 @@ Steps of this project are the following:
 * create a checkpoint directory: ``` $ mkdir ckpt```
 
 
-###**Model Training**
+### **Model Training**
 
 training command:
 
@@ -44,7 +44,7 @@ $ python -m segment_net --name=fcn --train=./datasets/train/ --valid=./datasets/
 * ```--crop_size``` flag is used to specify the crop size of training example from original image and mask (maximum 256). Larger the crop_size, slower the training speed
 
 
-###**Model Evaluation**
+### **Model Evaluation**
 
 * once the model is trained, it can be evaluated in notebook ```model_evaluation.ipynb```
 * load trained model in ```cell[2]```, ```KerasWrapper``` is a class wrap a keras like model API around tensorflow implementation (to be able to use evaluation functions provided by the project)
