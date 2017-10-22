@@ -61,6 +61,12 @@ $ python -m segment_net --name=fcn --train=./datasets/train/ --valid=./datasets/
 the decoder up-sample a small feature map by factor=2 (by a transpose convolution layer), depth concat the filters with the next level feature map, and then aggregate the combined feature by a convolution layer.
 * the last output of the decoder's spatial size is the same as the original image, a 1x1 convolution layer is applied to reduce the filters to num_classes (which is 3 in this project), the output feature map is the logits (unormalized log probability of each class) of each pixels
 
+* the graphical illustration of this architecture:
+
+[image_0]: ./docs/misc/fcn_network.png
+![alt text][image_0]
+
+
 ### **Traing Implementation**
 
 * the training pipeline is implemented in ```segment_net/train.py:227 train_main()```
@@ -68,6 +74,14 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 * dataset is loaded by function ```create_dataset()``` called in each function generator (e.g. ```81: train_network(sess)```)
 * the network variables are shared across different application (``` i.e. train, score, validate```) by tensorflow's ```variable_scope``` parameter sharing mechanism
 * the score_fn compute the pixel-wise averaged (**across the whole dataset**) mean-iou in three datasets: following, patrol_with_targ, overall evaluation dataset, this score_fn implementation is different from the final score provided by the project **(the mean-iou of each image averaged over images)**. Yet it is a good indicator for the final score
+
+### **Parameter Tuning**
+
+* **crop_size:** the random crop size affect the training speed and the quality of the model. Too small crop size will degrade the model quality while too large crop size will increase the epoch time, 128x128 is a good trade-off after several trails (candidates 64x64, 160x160, 256x256(full size))
+* **bath_size:** batch size can be in range 16 - 128, too large batch size will increase the time spend on each update step, hence elongate the convergence time. too small batch size is bad in GPU utilization, 32 is a good trade-off
+* **epoch_size:** the dataset is relatively small (about 10,000 images), hence the model takes many epochs to converge. I choose a very large pre-set epoch size (500), and manually stop training if the IOU on validation set stops increasing.
+* **learning_rate:** I use learning rate by default in tensorflow adam optimization and find it is good enough.
+
 
 ### **hyperparameters**
 
@@ -90,6 +104,11 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 * follow the hero in a straight line in low attitude
 * patrol in a alley lane
 * patrol in a very long trail
+
+### **Extension to Other Classes**
+
+* the model parameter trained on this task could not be generalized to many more classes.
+* the architecture could be reused by collecting training data of other classes and retrain the model.
 
 
 ### **FCN Results**
