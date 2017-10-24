@@ -77,6 +77,7 @@ def decoder(name):
     for pool, tcc in zip(pools[1:], tccs):
       last_pool = tcc(last_pool, pool)
     prob = one_by_one(last_pool)
+
     return prob
   return decoder_fn
 

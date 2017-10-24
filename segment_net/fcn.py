@@ -1,4 +1,3 @@
-import tensorflow as tf
 from segment_net.fcn_flags import *
 
 
@@ -6,7 +5,8 @@ def encoder(img, scale):
 
   def conv_and_pool(feature):
     conv = tf.layers.separable_conv2d(
-      feature, FLAGS.encode_filters, 3, 1,
+      feature, filters=FLAGS.encode_filters,
+      kernel_size=3, strides=1,
       padding='SAME', activation=tf.nn.relu)
     pool = tf.layers.max_pooling2d(
       conv, scale, scale, padding='SAME')

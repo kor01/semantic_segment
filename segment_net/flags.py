@@ -27,7 +27,7 @@ tf.flags.DEFINE_boolean('normalize', True, 'normalize image')
 tf.flags.DEFINE_integer('threads', 4, 'number of preprocess threads')
 tf.flags.DEFINE_integer('crop_size', 64, 'crop size')
 tf.flags.DEFINE_integer('batch_size', 128, 'number pf filters')
-tf.flags.DEFINE_integer('cache_batch', 24, 'batch to cache in memory')
+tf.flags.DEFINE_integer('cache_batch', 128, 'batch to cache in memory')
 
 
 FLAGS = tf.flags.FLAGS

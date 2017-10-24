@@ -86,7 +86,9 @@ def random_crop_images(dataset):
     image, mask = concat[:, :, :3], concat[:, :, 3:]
     return image, mask
   assert isinstance(dataset, dt.Dataset)
-  return dataset.map(crop_fn)
+  return dataset.map(
+    crop_fn, num_threads=FLAGS.threads,
+    output_buffer_size=FLAGS.cache_batch)
 
 
 def create_dataset(image_files, mask_files,

@@ -22,7 +22,18 @@ def save_network(your_model, your_weight_filename):
         json.dump(your_model_json, file)  
         
     your_model.save_weights(weight_path) 
-        
+
+
+def load_keras_model(path):
+    name = os.path.basename(path)
+    dir_name = os.path.dirname(path)
+    config_path = os.path.join(dir_name, 'config_' + name)
+    with open(config_path) as ip:
+      json_string = json.load(ip)
+    model = keras.models.model_from_json(json_string)
+    model.load_weights(path)
+    return model
+
         
 def load_network(your_weight_filename):
     config_name = 'config' + '_' + your_weight_filename

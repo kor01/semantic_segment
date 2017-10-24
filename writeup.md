@@ -22,6 +22,7 @@ Steps of this project are the following:
 * download evaluation dataset (sample_evaluation_data)
 * download or collect validation dataset, as training dataset
 * tensorflow version >= 1.3.1 (to use the dataset features)
+* keras version >= 2.0.8 (to run follow-me in simulator)
 * create a checkpoint directory: ``` $ mkdir ckpt```
 
 
@@ -49,7 +50,7 @@ $ python -m segment_net --name=fcn --train=./datasets/train/ --valid=./datasets/
 * once the model is trained, it can be evaluated in notebook ```model_evaluation.ipynb```
 * load trained model in ```cell[2]```, ```KerasWrapper``` is a class wrap a keras like model API around tensorflow implementation (to be able to use evaluation functions provided by the project)
 * change the ```name='fcn', path='ckpt/fcn'``` in ```cell[2]``` to the intended model and ckpt
-* the example included in file ```model_evaluation.ipynb``` is the evaluation of the best performing FCN implementation in this project, achieves ```final_score=0.569831471427```
+* the example included in file ```model_evaluation.ipynb``` is the evaluation of the best performing FCN implementation in this project, achieves ```final_score=0.571723291159```
 
 
 ### **FCN Model Architecture**
@@ -66,6 +67,38 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 [image_0]: ./docs/misc/fcn_network.png
 ![alt text][image_0]
 
+
+### **Encoder-Decoder Architecture Intuition**
+
+The intuition behind encoder-decoder architecture is to build an image feature map that contains simultaneously the high level semantic information and low level geometric information:
+
+  * the encoders build successive features by stacking convolutions and pooling, each layer encodes information at different level. The higher level layers encodes more semantic information and less spatial information.
+
+  * the decoders perform information integration. At each level, one decoder layer integrates a higher level feature map with a lower level feature map into a new feature map therefore distributing the semantic features over spatial features.
+
+  * the feature map before logits layer (one_by_one) encodes semantic information on each pixel
+
+### **One by One Convolutions**
+
+one-by-one convolutions are linear transforms over depth dimension of feature maps (followed by an activation).
+
+mathematically, for a NHWC tensor T of shape ```(a, b, c, d)```:
+
+  * one-by-one convolution is equivalent to:
+
+    ```W.shape = (d, e); b.shape = (e,) ```
+
+    ```conv_one_by_one(T) := reshape(matmul(reshape(T, (a, -1, d)), W) + b, (a, b, c, e))```
+
+* fully-connected layer is equivalent to a full-kernel-size convolution (kernel_size=image_size):
+
+    ```W.shape = (b * c * d, e); b.shape = (e,) ```
+
+    ``` fc(T) := matmul(reshape(T, (a, -1)), W) + b```
+
+the operation is used in this project to reduce the last decoder layer output feature-maps depth to the number of semantic classes (in order to generate logits on each pixel)
+
+another usage is in the separable convolution operator. in separable convolutions decomposes convolution into a spatial transform (on each feature map) and followed by a depth transform (a one-by-one convolution)
 
 ### **Traing Implementation**
 
@@ -125,11 +158,27 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 
 * as evaluated in ```model_evaluation.ipynb```, the model achives:
 
-    * total iou in evaluation dataset: ```weights = 0.8 ```
-    * following dataset: ```iou = 0.953752144791 ```
-    * with_targ dataset: ```iou = 0.470826533776 ```
-    * ``` final_score = 0.569831471427 > 0.4``` (the project requirement)
+    * total iou in evaluation dataset: ```weights = 0.8176795580110497 ```
+    * following dataset: ```iou = 0.956149201192 ```
+    * with_targ dataset: ```iou = 0.442255065021 ```
+    * ``` final_score = 0.571723291159 > 0.4``` (the project requirement)
     * the ckpt is included in this repo
+
+* the model is converted to keras fmt and evaluated in ```keras_evaluation.ipynb ```
+
+* the converted keras model performance (final_score=0.568771257547) is a little lower than the above since the above model predicts hard-class (see ```segment_net/network.py: 92```) while the keras model s softmax
+
+### **Follow Me in Simulator**
+
+* the project has included a modified follower.py:
+
+  * add ```os.environ['CUDA_VISIBLE_DEVICES'] = '' ``` to prevent using gpu in inference
+  * load model through ```model_tools.load_keras_model``` (the directory structure of this project is different from the original one)
+  * change ``` import tensorflow.contrib.keras  as keras ``` to ``` import keras ```, the ```contrib.keras``` run into cuda error when tested on my machine.
+
+* run follow-me trail: ```$ python follower.py ./keras_model/fcn --pred_viz``` in project directory
+
+
 
 ### **Future Improvements**
 

@@ -40,8 +40,8 @@ def save_as_h5(model):
   if not os.path.exists(FLAGS.output):
     os.mkdir(FLAGS.output)
   assert isinstance(model, keras.engine.Model)
-  config_path = os.path.join(FLAGS.output, 'config_fcn.json')
-  weights_path = os.path.join(FLAGS.output, 'fcn_weights.h5')
+  config_path = os.path.join(FLAGS.output, 'config_fcn')
+  weights_path = os.path.join(FLAGS.output, 'fcn')
   with open(config_path, 'w') as op:
     json.dump(model.to_json(), op)
   model.save_weights(weights_path)
