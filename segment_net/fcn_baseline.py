@@ -1,8 +1,9 @@
 import tensorflow as tf
 
 
+tf.flags.DEFINE_integer('filters', 32, 'filters in encoder')
+
 FLAGS = tf.flags.FLAGS
-tf.flags.DEFINE_integer('filters', 32, 'number pf filters')
 
 
 def encoder_block(img):

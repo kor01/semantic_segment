@@ -80,32 +80,45 @@ class KerasWrapper(object):
 
   def __init__(self, name, path=None,
                sess=None, reuse=False):
-    sess = sess or tf.Session()
-    self._sess = sess
-    self._tensors = build_network(
-      name, reuse=reuse, train=False, iou=True)
-    pred = tf.argmax(self._tensors.softmax, axis=-1)
-    pred = tf.one_hot(pred, 3, axis=-1)
-    self._pred_op = pred
-    assert isinstance(sess, tf.Session)
-    if not reuse:
-      sess.run(tf.global_variables_initializer())
-    self._saver = tf.train.Saver(
-      var_list=tf.trainable_variables())
-    if path is not None:
-      self.load(path)
+    if sess is None:
+      self.graph = tf.Graph()
+      self.sess = tf.Session(graph=self.graph)
+
+    else:
+      self.sess, self.graph = sess, sess.graph
+
+    with self.graph.as_default():
+      self._tensors = build_network(
+        name, reuse=reuse, train=False, iou=True)
+      pred = tf.argmax(self._tensors.softmax, axis=-1)
+      pred = tf.one_hot(pred, 3, axis=-1)
+
+      self._pred_op = pred
+      if not reuse:
+        self.sess.run(tf.global_variables_initializer())
+      self._saver = tf.train.Saver(
+        var_list=tf.trainable_variables())
+      if path is not None:
+        self.load(path)
 
   def load(self, path):
     ckpt = tf.train.get_checkpoint_state(path)
     self._saver.restore(
-      self._sess, ckpt.model_checkpoint_path)
+      self.sess, ckpt.model_checkpoint_path)
+
+  @property
+  def variables(self):
+    with self.graph.as_default():
+      variables = tf.trainable_variables()
+      values = self.sess.run(variables)
+      return list(zip(variables, values))
 
   @property
   def layers(self):
      return [Layer(output_shape=[FLAGS.width, FLAGS.height, 3])]
 
   def predict_on_batch(self, x):
-    ret = self._sess.run(
+    ret = self.sess.run(
       self._pred_op,
       feed_dict={self._tensors.images: x})
     return ret

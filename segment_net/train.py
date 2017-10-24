@@ -223,7 +223,6 @@ def save_network(sess):
   return save_fn, restore_fn
 
 
-
 def train_main():
   sess = tf.Session()
   train_fn = train_network(sess)

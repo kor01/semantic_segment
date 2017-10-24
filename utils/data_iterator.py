@@ -161,7 +161,6 @@ class BatchIteratorSimple(Iterator):
                 batch_x[e,:,:,:] = image
                 batch_y[e,:,:,:] = gt_image
 
-
         if not self.training:
             return batch_x
 
