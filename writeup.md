@@ -55,11 +55,11 @@ $ python -m segment_net --name=fcn --train=./datasets/train/ --valid=./datasets/
 ### **FCN Model Architecture**
 
 * the model architecture is implemented by four encoders and four decoders, in file ```segment_net/fcn.py```
-* the encoders are implemented with one separable convolution layer and one pooling layer, each encoder shrink the spatial dimension of the feature map by **2x**
+* the encoders are implemented with one separable convolution layer and one pooling layer, each encoder shrink the spatial dimension of the feature-maps by **2x**
 * all the pooling layer's outputs are included as the output of encoding process, the original image is also included as the output of encoding, making a **image feature pyramid**
 * the decoder reduce the encoder output pyramid up-down, in each step
-the decoder up-sample a small feature map by factor=2 (by a transpose convolution layer), depth concat the filters with the next level feature map, and then aggregate the combined feature by a convolution layer.
-* the last output of the decoder's spatial size is the same as the original image, a 1x1 convolution layer is applied to reduce the filters to num_classes (which is 3 in this project), the output feature map is the logits (unormalized log probability of each class) of each pixels
+the decoder up-sample a small feature map by factor=2 (by a transpose convolution layer), depth concat the filters with the next level feature-maps, and then aggregate the combined feature by a convolution layer.
+* the last output of the decoder's spatial size is the same as the original image, a 1x1 convolution layer is applied to reduce the filters to num_classes (which is 3 in this project), the output feature-maps is the logits (unormalized log probability of each class) of each pixels
 
 * the graphical illustration of this architecture:
 
@@ -69,17 +69,17 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 
 ### **Encoder-Decoder Architecture Intuition**
 
-The intuition behind encoder-decoder architecture is to build an image feature map that contains simultaneously the high level semantic information and low level geometric information:
+The intuition behind encoder-decoder architecture is to build image feature-maps that contains simultaneously the high level semantic information and low level geometric information:
 
-  * the encoders build successive features by stacking convolutions and pooling, each layer encodes information at different level. The higher level layers encodes more semantic information and less spatial information.
+  * the encoders build successive feature-maps by stacking convolutions and pooling, each layer encodes information at different level. The higher level layers encodes more semantic information and less spatial information.
 
-  * the decoders perform information integration. At each level, one decoder layer integrates a higher level feature map with a lower level feature map into a new feature map therefore distributing the semantic features over spatial features.
+  * the decoders perform information integration. At each level, one decoder integrates higher level feature-maps with lower level feature-maps into new feature-maps therefore distributing the semantic features over spatial features.
 
-  * the feature map before logits layer (one_by_one) encodes semantic information on each pixel
+  * the feature-maps before logits layer (1x1 conv) encodes semantic information on each pixel
 
 ### **One by One Convolutions**
 
-one-by-one convolutions are linear transforms over depth dimension of feature maps (followed by an activation).
+one-by-one convolutions are linear transforms over depth dimension of feature-maps (followed by an activation).
 
 mathematically, for a NHWC tensor T of shape ```(a, b, c, d)```:
 
@@ -165,7 +165,7 @@ another usage is in the separable convolution operator. in separable convolution
 
 * the model is converted to keras fmt and evaluated in ```keras_evaluation.ipynb ```
 
-* the converted keras model performance (final_score=0.568771257547) is a little lower than the above since the above model predicts hard-class (see ```segment_net/network.py: 92```) while the keras model s softmax
+* the converted keras model performance (```final_score=0.568771257547```) is a little lower than the above since the above model predicts hard-class (see ```segment_net/network.py: 92```) while the keras model s softmax
 
 ### **Follow Me in Simulator**
 
