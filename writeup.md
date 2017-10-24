@@ -75,6 +75,16 @@ the decoder up-sample a small feature map by factor=2 (by a transpose convolutio
 * the network variables are shared across different application (``` i.e. train, score, validate```) by tensorflow's ```variable_scope``` parameter sharing mechanism
 * the score_fn compute the pixel-wise averaged (**across the whole dataset**) mean-iou in three datasets: following, patrol_with_targ, overall evaluation dataset, this score_fn implementation is different from the final score provided by the project **(the mean-iou of each image averaged over images)**. Yet it is a good indicator for the final score
 
+
+### **Convert To Keras**
+
+* the checkpoint of fcn model can be converted to keras format by:
+
+  ```$ python ckpt_to_keras.py --save=./ckpt/fcn --output=./keras_model```
+
+* the ```--save``` flag points to the directory of tensorflow checkpoint, ```--output``` flag points to the directory of keras_model
+
+
 ### **Parameter Tuning**
 
 * **crop_size:** the random crop size affect the training speed and the quality of the model. Too small crop size will degrade the model quality while too large crop size will increase the epoch time, 128x128 is a good trade-off after several trails (candidates 64x64, 160x160, 256x256(full size))
