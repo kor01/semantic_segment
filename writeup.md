@@ -32,7 +32,6 @@ training command:
 
 ```
 $ python -m segment_net --name=fcn --train=./datasets/train/ --valid=./datasets/validation/ --evaluate=./datasets/sample_evaluation_data/ --save=./ckpt/fcn/ --batch_size=32 --crop_size=128 --log=./ckpt/fcn/train.log
-
 ```
 
 * meaning of flags are explained in file ```segment_net/flags.py```
@@ -100,7 +99,7 @@ the operation is used in this project to reduce the last decoder layer output fe
 
 another usage is in the separable convolution operator. in separable convolutions decomposes convolution into a spatial transform (on each feature map) and followed by a depth transform (a one-by-one convolution)
 
-### **Traing Implementation**
+### **Training Implementation**
 
 * the training pipeline is implemented in ```segment_net/train.py:227 train_main()```
 * the pipeline basically define a set of functions: ```train_fn, validate_fn, score_fn, save_fn, and restore_fn``` using python's closure feature
