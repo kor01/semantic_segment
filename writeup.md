@@ -119,8 +119,8 @@ another usage is in the separable convolution operator. in separable convolution
 
 ### **Parameter Tuning**
 
-* **crop_size:** the random crop size affect the training speed and the quality of the model. Too small crop size will degrade the model quality while too large crop size will increase the epoch time, 128x128 is a good trade-off after several trails (candidates 64x64, 160x160, 256x256(full size))
-* **bath_size:** batch size can be in range 16 - 128, too large batch size will increase the time spend on each update step, hence elongate the convergence time. too small batch size is bad in GPU utilization, 32 is a good trade-off
+* **crop_size:** the random crop size affect the training speed and the quality of the model. Too small crop size will degrade the model quality while too large crop size will increase the epoch time, ```128x128``` is a good trade-off after several trails (candidates ```64x64, 160x160, 256x256(full size)```)
+* **bath_size:** batch size can be in range ```(16, 128)```, too large batch size will increase the time spend on each update step, hence elongate the convergence time. too small batch size is bad in GPU utilization, 32 is a good trade-off
 * **epoch_size:** the dataset is relatively small (about 10,000 images), hence the model takes many epochs to converge. I choose a very large pre-set epoch size (500), and manually stop training if the IOU on validation set stops increasing.
 * **learning_rate:** I use learning rate by default in tensorflow adam optimization and find it is good enough.
 
